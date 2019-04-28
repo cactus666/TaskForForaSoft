@@ -24,7 +24,7 @@ public class Fragment_for_search  extends Fragment {
 
     // создается меню
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_fragment_start, menu);
+        inflater.inflate(R.menu.menu_start, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
