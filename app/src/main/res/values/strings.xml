@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">TaskForForaSoft</string>
+    <string name="search_field">Search</string>
+    <string name="album">Album</string>
+    <string name="filter_search">filter search</string>
+
+
+</resources>
