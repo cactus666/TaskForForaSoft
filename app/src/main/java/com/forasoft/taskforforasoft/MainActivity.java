@@ -38,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
         inputManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
 
         listView=(ListView)findViewById(R.id.listView);
+        new RequestToItunesAPI().universalRequest("album", "Нищая страна");
+//        new RequestToItunesAPI().universalRequest("musicTrack", "белые хлопья");
     }
 
     public void searchItem(String textToSearch){
