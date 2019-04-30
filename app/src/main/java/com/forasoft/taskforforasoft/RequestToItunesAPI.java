@@ -1,6 +1,8 @@
 package com.forasoft.taskforforasoft;
 
 import android.util.Log;
+import android.widget.TextView;
+
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Response;
@@ -33,6 +35,8 @@ public class RequestToItunesAPI {
     // 1) entity = album; term = String (все, что угодно: название альма, исполнителя, песни), из-за избыточной инф. в каждом объекте получаем данных о альбоме (даже если указан трек)
     // 2) entity = musicTrack; term = albumName (задает программа, на основании вабранного альбома)
     public void universalRequest(final String entity, String term){
+        Log.d("position", "r_1");
+        TextView r;
         // используем этот метод(чистим url_for_request), по 2 причинам:
         // 1. этот метод не пересоздает массив, как метод delete, а просто заполняет 0
         // 2. если использовать метод delete, то теряется расширяемось, а так первую часть адреса можно вынести в агументы к запросу.
@@ -60,6 +64,7 @@ public class RequestToItunesAPI {
 
             @Override
             public void onResponse(Response response) throws IOException {
+                Log.d("position", "r_2");
                 try {
                     Log.d("url", url_for_request.toString());
                     // получаем результат
@@ -105,6 +110,7 @@ public class RequestToItunesAPI {
                     }else{
                         Log.e("err", "check request parameter(entity)");
                     }
+                    Log.d("position", "r_3");
                 } catch (JSONException ex) {
                     Log.e("err", "error with parse json result", ex);
                 }
