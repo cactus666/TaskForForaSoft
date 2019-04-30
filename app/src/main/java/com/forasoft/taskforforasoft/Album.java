@@ -1,9 +1,10 @@
 package com.forasoft.taskforforasoft;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class Album {
+public class Album implements Serializable {
 
     private String artistName;
     private String albumCensoredName;

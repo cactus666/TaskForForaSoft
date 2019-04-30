@@ -1,6 +1,8 @@
 package com.forasoft.taskforforasoft;
 
-public class MusicTrack {
+import java.io.Serializable;
+
+public class MusicTrack implements Serializable {
     private String trackCensoredName;
     private int trackTimeMillis;
     private int trackNumber;
