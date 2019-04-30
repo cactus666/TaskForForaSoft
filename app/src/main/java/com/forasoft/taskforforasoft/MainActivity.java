@@ -31,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<String> listItems;
     ArrayAdapter<String> adapter;
     ListView listView;
-    private final Intent intent = new Intent(this, AlbumActivity.class);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         inputManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
 
         listView=(ListView)findViewById(R.id.listView);
-        new RequestToItunesAPI().universalRequest("album", "Нищая страна");
+//        new RequestToItunesAPI().universalRequest("album", "Нищая страна");
 //        new RequestToItunesAPI().universalRequest("musicTrack", "белые хлопья");
     }
 
@@ -57,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void initList(){
-        items=new String[]{"Java","JavaScript","C#","PHP", "С++", "Python", "C", "SQL", "Ruby", "Objective-C", "JavA","JAVvScript","C1#","PHP", "СC++", "Py23thon", "C", "SQDFL", "Rub", "ObjectDFDive-C"};
+        items=new String[]{"Java","JavaScript","C#","PHP", "Нищая страна", "Python", "C", "SQL", "Ruby", "Objective-C", "JavA","JAVvScript","C1#","PHP", "СC++", "Py23thon", "C", "SQDFL", "Rub", "ObjectDFDive-C"};
         listItems=new ArrayList<>(Arrays.asList(items));
         adapter=new ArrayAdapter<String>(this, R.layout.item_for_list_with_albums, R.id.txtitem, listItems);
         listView.setAdapter(adapter);
@@ -65,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 //                Log.d("value", adapter.getItem(position));
+                Intent intent = new Intent(getApplicationContext(), AlbumActivity.class);
                 intent.putExtra("album_name", adapter.getItem(position));
                 startActivity(intent);
             }
