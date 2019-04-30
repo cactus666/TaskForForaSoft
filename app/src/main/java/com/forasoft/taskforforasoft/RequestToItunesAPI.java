@@ -80,15 +80,15 @@ public class RequestToItunesAPI {
                         // проходимся по каждому альбому и вызываем метод обработки альбома
                         for(int i = 0; i < countAlbums; i++){
                             albumJsonObject = resJsonArray.getJSONObject(i);
-//                            String[] result_arr = {albumJsonObject.getString("artistName"),
-//                                    albumJsonObject.getString("collectionCensoredName"),
-//                                    albumJsonObject.getString("artworkUrl60"),
-//                                    albumJsonObject.getString("trackCount"),
-//                                    albumJsonObject.getString("copyright"),
-//                                    albumJsonObject.getString("primaryGenreName"),
-//                                    albumJsonObject.getString("releaseDate")};
-//                            callbackForResult.call(result_arr, true);
-                            callbackForResult.call("result_arr", true);
+                            String[] result_arr = {
+                                    albumJsonObject.getString("artistName"),
+                                    albumJsonObject.getString("copyright"),
+                                    albumJsonObject.getString("primaryGenreName"),
+                                    albumJsonObject.getString("releaseDate"),
+                                    albumJsonObject.getString("trackCount"),
+                                    albumJsonObject.getString("artworkUrl60"),
+                                   };
+                            callbackForResult.call(result_arr, true);
 
                             System.out.println(new Album(
                                     albumJsonObject.getString("artistName"),
