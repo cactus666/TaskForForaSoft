@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -9,6 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
+        android:layout_marginTop="10dp"
         android:paddingRight="20dp"
         android:layout_marginRight="5dp"
         android:title="arr">
@@ -18,10 +19,25 @@
         android:id="@+id/search_field"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textMultiLine"
+        android:layout_toRightOf="@+id/back_arrow"
+        android:layout_toLeftOf="@+id/send"
+        android:hint="Search"
         android:cursorVisible="true"
-        android:hint="Search">
+        android:inputType="textMultiLine">
         <!--android:backgroundTint="@android:color/transparent"-->
     </EditText>
 
-</LinearLayout>
+    <ImageView
+        android:id="@+id/send"
+        android:src="@drawable/ic_send"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="10dp"
+        android:paddingLeft="20dp"
+        android:layout_marginLeft="5dp"
+        android:title="send">
+    </ImageView>
+
+
+</RelativeLayout>
