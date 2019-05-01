@@ -208,8 +208,6 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-
-
     int count = 0;
     public class CallBackForGettingAlbumsAndCreateList implements com.forasoft.taskforforasoft.Callback{
         // в методе call осуществляется инициализация интерфейса прокручивающегося листа с альбомами
@@ -219,16 +217,20 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     if(type){
+//                        if(count != 0){
+//                            fragment_transaction = getFragmentManager().beginTransaction();
+//                            fragment_transaction.remove(fragment_list_for_albums);
+//                            fragment_transaction.commit();
+//                        }
                         fragment_transaction = getFragmentManager().beginTransaction();
                         Bundle args = new Bundle();
-                        args.putString("arg", "fuck"+count);
                         args.putParcelableArrayList("result_list", (ArrayList<? extends Parcelable>) result_list);
                         fragment_list_for_albums = new FragmentListForAlbums();
                         fragment_list_for_albums.setArguments(args);
-                        fragment_transaction.replace(R.id.fragmentListOrGridView, fragment_list_for_albums);
+                        // заменяем текущий список новым, должен быть метод replays, но здесь он работает как add, а add как replays
+                        // если список заменить на TextView(в Album_list.xml), то все работает как надо...
+                        fragment_transaction.add(R.id.fragmentListOrGridView, fragment_list_for_albums);
                         fragment_transaction.commit();
-                        count++;
-// передач данных в FLFA
                     }else{
                         Log.e("fail", "must be search by album");
                     }

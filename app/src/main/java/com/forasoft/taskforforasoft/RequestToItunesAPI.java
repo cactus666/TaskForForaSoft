@@ -90,25 +90,8 @@ public class RequestToItunesAPI {
                         // проходимся по каждому альбому и вызываем метод обработки альбома
                         for(int i = 0; i < countAlbums; i++){
                             albumJsonObject = resJsonArray.getJSONObject(i);
-//                            String[] result_arr = {
-//                                    albumJsonObject.getString("artistName"),
-//                                    albumJsonObject.getString("copyright"),
-//                                    albumJsonObject.getString("primaryGenreName"),
-//                                    albumJsonObject.getString("releaseDate"),
-//                                    albumJsonObject.getString("trackCount"),
-//                                    albumJsonObject.getString("artworkUrl60"),
-//                                   };
-
-                            Album album_object = new Album(
-                                    albumJsonObject.getString("artistName"),
-                                    albumJsonObject.getString("collectionCensoredName"),
-                                    albumJsonObject.getString("artworkUrl60"),
-                                    albumJsonObject.getInt("trackCount"),
-                                    albumJsonObject.getString("copyright"),
-                                    albumJsonObject.getString("primaryGenreName"),
-                                    albumJsonObject.getString("releaseDate")
-                            );
-                            result_list.add(album_object);
+                            // вызываем функцию заполнения объекта Album
+                            result_list.add(fillAlbumObject(albumJsonObject));
                         }
                         callbackForResult.call(result_list, true);
                     }else if(entity.intern() == "musicTrack"){
@@ -137,4 +120,57 @@ public class RequestToItunesAPI {
     }
 
 
+// метод заполнения объекта альбом
+    Album fillAlbumObject(JSONObject albumJsonObject){
+        String artistName, collectionCensoredName, artworkUrl60, copyright, primaryGenreName, releaseDate;
+        int trackCount;
+
+        try {
+            artistName = albumJsonObject.getString("artistName");
+        } catch (JSONException e) {
+            artistName = "missing";
+        }
+
+        try {
+            collectionCensoredName = albumJsonObject.getString("collectionCensoredName");
+        } catch (JSONException e) {
+            collectionCensoredName = "missing";
+        }
+
+        try {
+            artworkUrl60= albumJsonObject.getString("artworkUrl60");
+        } catch (JSONException e) {
+            artworkUrl60 = "missing";
+        }
+
+        try {
+            trackCount = albumJsonObject.getInt("trackCount");
+        } catch (JSONException e) {
+            trackCount = 0;
+        }
+
+        try {
+            copyright = albumJsonObject.getString("copyright");
+        } catch (JSONException e) {
+            copyright = "missing";;
+        }
+
+        try {
+            primaryGenreName = albumJsonObject.getString("primaryGenreName");
+        } catch (JSONException e) {
+            primaryGenreName = "missing";;
+        }
+
+        try {
+            releaseDate = albumJsonObject.getString("releaseDate");
+        } catch (JSONException e) {
+            releaseDate = "missing";;
+        }
+
+        Album album_object = new Album(artistName, collectionCensoredName, artworkUrl60, trackCount, copyright, primaryGenreName, releaseDate);
+
+        return album_object;
+    }
 }
+
+
