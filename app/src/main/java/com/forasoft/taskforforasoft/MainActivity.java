@@ -208,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    int count = 0;
+
     public class CallBackForGettingAlbumsAndCreateList implements com.forasoft.taskforforasoft.Callback{
         // в методе call осуществляется инициализация интерфейса прокручивающегося листа с альбомами
         @Override
@@ -217,20 +217,17 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     if(type){
-//                        if(count != 0){
-//                            fragment_transaction = getFragmentManager().beginTransaction();
-//                            fragment_transaction.remove(fragment_list_for_albums);
-//                            fragment_transaction.commit();
-//                        }
-                        fragment_transaction = getFragmentManager().beginTransaction();
+                        android.support.v4.app.FragmentTransaction fragment_transaction2 = getSupportFragmentManager().beginTransaction();
                         Bundle args = new Bundle();
                         args.putParcelableArrayList("result_list", (ArrayList<? extends Parcelable>) result_list);
                         fragment_list_for_albums = new FragmentListForAlbums();
                         fragment_list_for_albums.setArguments(args);
+                        // если использовать вместо android.support.v4.app.Fragment android.app.Fragment, то это приводит к странному поведению программы, см. ниже
                         // заменяем текущий список новым, должен быть метод replays, но здесь он работает как add, а add как replays
                         // если список заменить на TextView(в Album_list.xml), то все работает как надо...
-                        fragment_transaction.add(R.id.fragmentListOrGridView, fragment_list_for_albums);
-                        fragment_transaction.commit();
+                        // (баг пофиксил заменой android.app.Fragment на android.support.v4.app.Fragment для совместимости)
+                        fragment_transaction2.replace(R.id.fragmentListOrGridView, fragment_list_for_albums);
+                        fragment_transaction2.commit();
                     }else{
                         Log.e("fail", "must be search by album");
                     }
