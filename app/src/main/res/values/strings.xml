@@ -11,4 +11,6 @@
     <string name="date_release">Date release: </string>
     <string name="copyright">Copyright</string>
     <string name="primary_genre_name">Primary genre name: </string>
+
+    <string name="no_matching_albums_available">Нет подходящих альбомов:(</string>
 </resources>

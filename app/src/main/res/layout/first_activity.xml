@@ -1,20 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/LL1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:orientation="vertical">
 
-    <ListView
-        android:id="@+id/listView"
-        android:layout_width="fill_parent"
+    <!--<ListView-->
+    <!--android:id="@+id/listView"-->
+    <!--android:layout_width="fill_parent"-->
+    <!--android:layout_height="wrap_content">-->
+    <!--</ListView>-->
+
+    <fragment
+        android:id="@+id/fragm"
+        android:name="com.forasoft.taskforforasoft.FragmentListForAlbums"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content">
-    </ListView>
+    </fragment>
 
-    <!--<FrameLayout-->
-        <!--android:id="@+id/menu_content"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent">-->
-    <!--</FrameLayout>-->
+    <FrameLayout
+        android:id="@+id/fragmentGridView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </FrameLayout>
+
 </LinearLayout>

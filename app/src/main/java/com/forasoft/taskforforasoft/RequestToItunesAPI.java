@@ -40,6 +40,9 @@ public class RequestToItunesAPI {
     // варианты использования метода:
     // 1) entity = album; term = String (все, что угодно: название альма, исполнителя, песни), из-за избыточной инф. в каждом объекте получаем данных о альбоме (даже если указан трек)
     // 2) entity = musicTrack; term = albumName (задает программа, на основании вабранного альбома)
+
+//    example use method  - new RequestToItunesAPI().universalRequest("album", "Нищая страна");
+//                        - new RequestToItunesAPI().universalRequest("musicTrack", "белые хлопья");
     public void universalRequest(final String entity, String term, final com.forasoft.taskforforasoft.Callback callbackForResult){
         // используем этот метод(чистим url_for_request), по 2 причинам:
         // 1. этот метод не пересоздает массив, как метод delete, а просто заполняет 0
