@@ -3,6 +3,8 @@ package com.forasoft.taskforforasoft;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -30,12 +32,14 @@ public class MainActivity extends AppCompatActivity {
     private int nextStateBar = 0;
     private InputMethodManager inputManager;
     private RequestToItunesAPI requestToItunesAPI;
+    private FragmentTransaction fragment_transaction;
 
     String[] items;
     ArrayList<String> listItems;
     ArrayAdapter<String> adapter;
     ListView listView;
 
+    private FragmentListForAlbums fragment_list_for_albums;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.first_activity);
 
         inputManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+
+
 
 //        listView=(ListView)findViewById(R.id.listView);
         requestToItunesAPI = new RequestToItunesAPI();
@@ -204,16 +210,25 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
+    int count = 0;
     public class CallBackForGettingAlbumsAndCreateList implements com.forasoft.taskforforasoft.Callback{
         // в методе call осуществляется инициализация интерфейса прокручивающегося листа с альбомами
         @Override
-        public void call(final List<Object> result_list, final boolean type) {
+        public void call(final List<Parcelable> result_list, final boolean type) {
             MainActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if(type){
-
+                        fragment_transaction = getFragmentManager().beginTransaction();
+                        Bundle args = new Bundle();
+                        args.putString("arg", "fuck"+count);
+                        args.putParcelableArrayList("result_list", (ArrayList<? extends Parcelable>) result_list);
+                        fragment_list_for_albums = new FragmentListForAlbums();
+                        fragment_list_for_albums.setArguments(args);
+                        fragment_transaction.replace(R.id.fragmentListOrGridView, fragment_list_for_albums);
+                        fragment_transaction.commit();
+                        count++;
+// передач данных в FLFA
                     }else{
                         Log.e("fail", "must be search by album");
                     }

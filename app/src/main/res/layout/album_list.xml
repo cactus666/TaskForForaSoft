@@ -5,18 +5,36 @@
     android:orientation="vertical"
     android:gravity="center">
 
-    <ListView
-        android:id="@id/android:list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-    </ListView>
-
     <TextView
-        android:text="@string/no_matching_albums_available"
+        android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:id="@android:id/empty">
+        android:text="frag1_text">
     </TextView>
 
+    <!--<ListView-->
+        <!--android:id="@+id/list_for_albums"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content">-->
+    <!--</ListView>-->
+
+
+
+    <!--<ListView-->
+        <!--android:id="@id/android:list"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content">-->
+    <!--</ListView>-->
+
+    <!--<TextView-->
+        <!--android:text="@string/no_matching_albums_available"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginTop="50dp"-->
+        <!--android:id="@android:id/empty">-->
+    <!--</TextView>-->
+
 </LinearLayout>
+
+
+<!--delete-->

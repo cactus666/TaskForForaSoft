@@ -3,6 +3,7 @@ package com.forasoft.taskforforasoft;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
@@ -19,7 +20,7 @@ public class AlbumActivity extends AppCompatActivity {
     public class CallBackForUpdateDataAlbum implements com.forasoft.taskforforasoft.Callback{
         // в методе call осуществляется инициализация интерфейса прокручивающегося листа с треками
         @Override
-        public void call(List<Object> result_list, final boolean type) {
+        public void call(List<Parcelable> result_list, final boolean type) {
             AlbumActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {

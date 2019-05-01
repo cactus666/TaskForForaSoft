@@ -13,17 +13,26 @@
     <!--android:layout_height="wrap_content">-->
     <!--</ListView>-->
 
-    <fragment
-        android:id="@+id/fragm"
-        android:name="com.forasoft.taskforforasoft.FragmentListForAlbums"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-    </fragment>
+    <!--////////-->
+
+    <!--<fragment-->
+        <!--android:id="@+id/fragm"-->
+        <!--android:name="com.forasoft.taskforforasoft.FragmentListForAlbums"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content">-->
+    <!--</fragment>-->
+
+    <!--<FrameLayout-->
+        <!--android:id="@+id/fragmentListOrGridView"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content">-->
+    <!--</FrameLayout>-->
+
+    <!--//////////////////////////////////////////////////////////////-->
 
     <FrameLayout
-        android:id="@+id/fragmentGridView"
+        android:id="@+id/fragmentListOrGridView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
     </FrameLayout>
-
 </LinearLayout>

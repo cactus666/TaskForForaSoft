@@ -1,10 +1,13 @@
 package com.forasoft.taskforforasoft;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class Album implements Serializable {
+public class Album implements Parcelable {
 
     private String artistName;
     private String albumCensoredName;
@@ -37,6 +40,28 @@ public class Album implements Serializable {
         this.releaseDate = releaseDate;
     }
 
+
+    protected Album(Parcel in) {
+        artistName = in.readString();
+        albumCensoredName = in.readString();
+        urlImage = in.readString();
+        trackCount = in.readInt();
+        copyright = in.readString();
+        primaryGenreName = in.readString();
+        releaseDate = in.readString();
+    }
+
+    public static final Creator<Album> CREATOR = new Creator<Album>() {
+        @Override
+        public Album createFromParcel(Parcel in) {
+            return new Album(in);
+        }
+
+        @Override
+        public Album[] newArray(int size) {
+            return new Album[size];
+        }
+    };
 
     public String getArtistName() {
         return artistName;
@@ -84,5 +109,21 @@ public class Album implements Serializable {
                 .append(copyright)
                 .append(primaryGenreName)
                 .append(releaseDate).toString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(artistName);
+        dest.writeString(albumCensoredName);
+        dest.writeString(urlImage);
+        dest.writeInt(trackCount);
+        dest.writeString(copyright);
+        dest.writeString(primaryGenreName);
+        dest.writeString(releaseDate);
     }
 }

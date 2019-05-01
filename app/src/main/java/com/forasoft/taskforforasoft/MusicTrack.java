@@ -1,8 +1,11 @@
 package com.forasoft.taskforforasoft;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.io.Serializable;
 
-public class MusicTrack implements Serializable {
+public class MusicTrack implements Parcelable {
     private String trackCensoredName;
     private int trackTimeMillis;
     private int trackNumber;
@@ -12,6 +15,24 @@ public class MusicTrack implements Serializable {
         this.trackTimeMillis = trackTimeMillis;
         this.trackNumber = trackNumber;
     }
+
+    protected MusicTrack(Parcel in) {
+        trackCensoredName = in.readString();
+        trackTimeMillis = in.readInt();
+        trackNumber = in.readInt();
+    }
+
+    public static final Creator<MusicTrack> CREATOR = new Creator<MusicTrack>() {
+        @Override
+        public MusicTrack createFromParcel(Parcel in) {
+            return new MusicTrack(in);
+        }
+
+        @Override
+        public MusicTrack[] newArray(int size) {
+            return new MusicTrack[size];
+        }
+    };
 
     public String getTrackCensoredName() {
         return trackCensoredName;
@@ -31,5 +52,17 @@ public class MusicTrack implements Serializable {
                 .append(trackCensoredName)
                 .append(trackTimeMillis)
                 .append(trackNumber).toString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(trackCensoredName);
+        dest.writeInt(trackTimeMillis);
+        dest.writeInt(trackNumber);
     }
 }
