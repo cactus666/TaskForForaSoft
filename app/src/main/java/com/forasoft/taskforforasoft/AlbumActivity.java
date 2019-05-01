@@ -54,18 +54,7 @@ public class AlbumActivity extends AppCompatActivity {
             album_name = getIntent().getExtras().getString("album_name");
             name_album.setText(album_name);
             requestToItunesAPI = new RequestToItunesAPI();
-//            requestToItunesAPI.universalRequest("album", album_name);
-//            AsyncTaskForCallToItunesAPI asyncTaskForCallToItunesAPI = new AsyncTaskForCallToItunesAPI(album_name, this);
-
-
-//            Log.d("position", "0");
-//            asyncTaskForCallToItunesAPI.execute();
-//            Log.d("position", "1");
-
-
-
             requestToItunesAPI.universalRequest("album", album_name, new CallBackForUpdateDataAlbum());
-
         }catch(NullPointerException ex){
             Log.e("null point ex", "intent empty", ex);
         }
