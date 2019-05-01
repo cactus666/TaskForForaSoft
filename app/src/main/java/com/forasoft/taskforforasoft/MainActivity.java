@@ -16,21 +16,25 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private EditText search_field;
     private int nextStateBar = 0;
     private InputMethodManager inputManager;
+    private RequestToItunesAPI requestToItunesAPI;
 
     String[] items;
     ArrayList<String> listItems;
     ArrayAdapter<String> adapter;
     ListView listView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         inputManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
 
         listView=(ListView)findViewById(R.id.listView);
+        requestToItunesAPI = new RequestToItunesAPI();
 //        new RequestToItunesAPI().universalRequest("album", "Нищая страна");
 //        new RequestToItunesAPI().universalRequest("musicTrack", "белые хлопья");
     }
@@ -118,6 +123,19 @@ public class MainActivity extends AppCompatActivity {
                 // убираем видимую черточку снизу у EditText
                 search_field.setBackgroundResource(android.R.color.transparent);
 
+                // получаем EditText и устанавливаем для него слушатель
+                ((ImageView) newBar.findViewById(R.id.send)).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // получаем строку без бробелов(в начале и в конце) из поля ввода(search_field)
+                        String album_name = search_field.getText().toString().trim();
+                        Log.d("album", album_name);
+                        // проверяем полученную строку на наличие символов, и если они есть ищем альбомы
+                        if(album_name.length() != 0){
+                            requestToItunesAPI.universalRequest("album", album_name, new CallBackForGettingAlbumsAndCreateList());
+                        }
+                    }
+                });
 
                 // дает фокус EditText'у
                 search_field.requestFocus();
@@ -181,10 +199,29 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.filter_search:
                 break;
-            case R.id.send:
-
-                break;
         }
         return true;
+    }
+
+
+
+
+    public class CallBackForGettingAlbumsAndCreateList implements com.forasoft.taskforforasoft.Callback{
+        // в методе call осуществляется инициализация интерфейса прокручивающегося листа с альбомами
+        @Override
+        public void call(final List<Object> result_list, final boolean type) {
+            MainActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if(type){
+                        for(int i=0; i<result_list.size(); i++){
+                            System.out.println(result_list.get(i));
+                        }
+                    }else{
+                        Log.e("fail", "must be search by album");
+                    }
+                }
+            });
+        }
     }
 }

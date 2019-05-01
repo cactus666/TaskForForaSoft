@@ -11,12 +11,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class RequestToItunesAPI {
 
     private OkHttpClient okHttpClient;
     private StringBuilder url_for_request;
+    private JSONObject rootJsonObject;
+    private JSONArray resJsonArray;
+
 
     public RequestToItunesAPI(){
         okHttpClient = new OkHttpClient();
@@ -35,7 +40,7 @@ public class RequestToItunesAPI {
     // варианты использования метода:
     // 1) entity = album; term = String (все, что угодно: название альма, исполнителя, песни), из-за избыточной инф. в каждом объекте получаем данных о альбоме (даже если указан трек)
     // 2) entity = musicTrack; term = albumName (задает программа, на основании вабранного альбома)
-    public void universalRequest(final String entity, String term, final AlbumActivity.CallBackForUpdateDataAlbum callbackForResult){
+    public void universalRequest(final String entity, String term, final com.forasoft.taskforforasoft.Callback callbackForResult){
         // используем этот метод(чистим url_for_request), по 2 причинам:
         // 1. этот метод не пересоздает массив, как метод delete, а просто заполняет 0
         // 2. если использовать метод delete, то теряется расширяемось, а так первую часть адреса можно вынести в агументы к запросу.
@@ -69,28 +74,29 @@ public class RequestToItunesAPI {
                     String result = response.body().string();
 //                    Log.d("result", result);
                     // конвертируем полученный результат в json представление
-                    JSONObject rootJsonObject = new JSONObject(result);
+                    rootJsonObject = new JSONObject(result);
 //                    Log.d("result", rootJsonObject.toString());
                     if(entity.intern() == "album"){
                         // получпем количество найденных альбомов
                         int countAlbums = rootJsonObject.getInt("resultCount");
                         // вытягиваем из rootJsonObject json массив, в котором лежат все json объекты (альбомы)
-                        JSONArray resJsonArray = rootJsonObject.getJSONArray("results");
+                        resJsonArray = rootJsonObject.getJSONArray("results");
                         JSONObject albumJsonObject;
+                        // создаем лист объектов, используем конкретную реализацию - ArrayList, т.к. подкопотом там массив, сразу задаем капасити, чтобы не расширять массив в двое
+                        List result_list = new ArrayList<>(countAlbums);
                         // проходимся по каждому альбому и вызываем метод обработки альбома
                         for(int i = 0; i < countAlbums; i++){
                             albumJsonObject = resJsonArray.getJSONObject(i);
-                            String[] result_arr = {
-                                    albumJsonObject.getString("artistName"),
-                                    albumJsonObject.getString("copyright"),
-                                    albumJsonObject.getString("primaryGenreName"),
-                                    albumJsonObject.getString("releaseDate"),
-                                    albumJsonObject.getString("trackCount"),
-                                    albumJsonObject.getString("artworkUrl60"),
-                                   };
-                            callbackForResult.call(result_arr, true);
+//                            String[] result_arr = {
+//                                    albumJsonObject.getString("artistName"),
+//                                    albumJsonObject.getString("copyright"),
+//                                    albumJsonObject.getString("primaryGenreName"),
+//                                    albumJsonObject.getString("releaseDate"),
+//                                    albumJsonObject.getString("trackCount"),
+//                                    albumJsonObject.getString("artworkUrl60"),
+//                                   };
 
-                            System.out.println(new Album(
+                            Album album_object = new Album(
                                     albumJsonObject.getString("artistName"),
                                     albumJsonObject.getString("collectionCensoredName"),
                                     albumJsonObject.getString("artworkUrl60"),
@@ -98,13 +104,15 @@ public class RequestToItunesAPI {
                                     albumJsonObject.getString("copyright"),
                                     albumJsonObject.getString("primaryGenreName"),
                                     albumJsonObject.getString("releaseDate")
-                            ).toString());
+                            );
+                            result_list.add(album_object);
                         }
+                        callbackForResult.call(result_list, true);
                     }else if(entity.intern() == "musicTrack"){
                         // получпем количество найденных треков
                         int countTrack = rootJsonObject.getInt("resultCount");
                         // вытягиваем из rootJsonObject json массив, в котором лежат все json объекты (треки)
-                        JSONArray resJsonArray = rootJsonObject.getJSONArray("results");
+                        resJsonArray = rootJsonObject.getJSONArray("results");
                         JSONObject trackJsonObject;
                         // проходимся по каждому треку и вызываем метод обработки трека
                         for(int i = 0; i < countTrack; i++){

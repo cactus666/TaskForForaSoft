@@ -22,8 +22,9 @@
         android:layout_toRightOf="@+id/back_arrow"
         android:layout_toLeftOf="@+id/send"
         android:hint="Search"
-        android:cursorVisible="true"
-        android:inputType="textMultiLine">
+        android:inputType="text"
+        android:cursorVisible="true">
+        <!--android:inputType="textMultiLine"-->
         <!--android:backgroundTint="@android:color/transparent"-->
     </EditText>
 

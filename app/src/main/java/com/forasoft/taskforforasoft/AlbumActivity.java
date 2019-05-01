@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
 
+import java.util.List;
+
 public class AlbumActivity extends AppCompatActivity {
 
     private String album_name;
@@ -14,32 +16,24 @@ public class AlbumActivity extends AppCompatActivity {
     public TextView name_album, name_artist, copyright, primary_genre_name, release_date, track_сount;
 
 
-    interface Callback {
-        // подготовим интерфейс по которому нам будут возвращать данные из запроса
-        // type задается для идентификации запроса true - результат по альбомам, false - результат по трекам
-        void call(String[] result, boolean type);
-    }
-
-
-    public class CallBackForUpdateDataAlbum implements Callback{
-        // в методе call осуществляется инициализация(возможное обновление, хотя я его так не использую, как следствие расширяемость) интерфейса
+    public class CallBackForUpdateDataAlbum implements com.forasoft.taskforforasoft.Callback{
+        // в методе call осуществляется инициализация интерфейса прокручивающегося листа с треками
         @Override
-        public void call(final String[] result, final boolean type) {
+        public void call(List<Object> result_list, final boolean type) {
             AlbumActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if(type){
-                        name_artist.setText(result[0]);
-                        copyright.setText(result[1]);
-                        primary_genre_name.setText(result[2]);
-                        release_date.setText(result[3]);
-                        track_сount.setText(result[4]);
+//                        name_artist.setText(result[0]);
+//                        copyright.setText(result[1]);
+//                        primary_genre_name.setText(result[2]);
+//                        release_date.setText(result[3]);
+//                        track_сount.setText(result[4]);
                     }else{
                         Log.d("debug", "call");
                     }
                 }
             });
-
         }
     }
 
