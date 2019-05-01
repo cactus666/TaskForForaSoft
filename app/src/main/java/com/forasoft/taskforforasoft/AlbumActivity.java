@@ -20,22 +20,20 @@ public class AlbumActivity extends AppCompatActivity {
     private TextView name_album, name_artist, copyright, primary_genre_name, release_date, track_сount;
     private ImageView label_album;
 
-    public class CallBackForUpdateDataAlbum implements com.forasoft.taskforforasoft.Callback{
+    public class CallBackForCreateTrackList implements com.forasoft.taskforforasoft.Callback{
         // в методе call осуществляется инициализация интерфейса прокручивающегося листа с треками
         @Override
-        public void call(List<Parcelable> result_list, final boolean type) {
+        public void call(final List<Parcelable> result_list) {
             AlbumActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if(type){
+
 //                        name_artist.setText(result[0]);
 //                        copyright.setText(result[1]);
 //                        primary_genre_name.setText(result[2]);
 //                        release_date.setText(result[3]);
 //                        track_сount.setText(result[4]);
-                    }else{
-                        Log.d("debug", "call");
-                    }
+
                 }
             });
         }
@@ -67,7 +65,8 @@ public class AlbumActivity extends AppCompatActivity {
 //            copyright.setText(album.getCopyright());
             primary_genre_name.setText(album.getPrimaryGenreName());
             release_date.setText(album.getReleaseDate());
-            track_сount.setText(album.getTrackCount()+"");
+            // т.к в результате получаем кол. треков в альбоме + сам альбом, то нужно вычесть 1, и получится кол. песен
+            track_сount.setText((album.getTrackCount()-1)+"");
             // асинхронно загружаем картинку для альбома
             Picasso.with(this)
                     .load(album.getUrlImage())
@@ -75,7 +74,7 @@ public class AlbumActivity extends AppCompatActivity {
 
 
             requestToItunesAPI = new RequestToItunesAPI();
-//            requestToItunesAPI.universalRequest("musicTrack", null, new CallBackForUpdateDataAlbum(), new Integer(album.getIdAlbum()));
+            requestToItunesAPI.universalRequest("song", null, new CallBackForCreateTrackList(), new Integer(album.getIdAlbum()));
         }catch(NullPointerException ex){
             Log.e("null point ex", "intent empty", ex);
         }

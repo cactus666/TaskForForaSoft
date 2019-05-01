@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private int nextStateBar = 0;
     private InputMethodManager inputManager;
     private RequestToItunesAPI requestToItunesAPI;
-    private FragmentTransaction fragment_transaction;
+    private android.support.v4.app.FragmentTransaction fragment_transaction;
 
     String[] items;
     ArrayList<String> listItems;
@@ -212,12 +212,11 @@ public class MainActivity extends AppCompatActivity {
     public class CallBackForGettingAlbumsAndCreateList implements com.forasoft.taskforforasoft.Callback{
         // в методе call осуществляется инициализация интерфейса прокручивающегося листа с альбомами
         @Override
-        public void call(final List<Parcelable> result_list, final boolean type) {
+        public void call(final List<Parcelable> result_list) {
             MainActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if(type){
-                        android.support.v4.app.FragmentTransaction fragment_transaction2 = getSupportFragmentManager().beginTransaction();
+                        fragment_transaction = getSupportFragmentManager().beginTransaction();
                         Bundle args = new Bundle();
                         args.putParcelableArrayList("result_list", (ArrayList<? extends Parcelable>) result_list);
                         fragment_list_for_albums = new FragmentListForAlbums();
@@ -226,11 +225,8 @@ public class MainActivity extends AppCompatActivity {
                         // заменяем текущий список новым, должен быть метод replays, но здесь он работает как add, а add как replays
                         // если список заменить на TextView(в Album_list.xml), то все работает как надо...
                         // (баг пофиксил заменой android.app.Fragment на android.support.v4.app.Fragment для совместимости)
-                        fragment_transaction2.replace(R.id.fragmentListOrGridView, fragment_list_for_albums);
-                        fragment_transaction2.commit();
-                    }else{
-                        Log.e("fail", "must be search by album");
-                    }
+                        fragment_transaction.replace(R.id.fragmentListOrGridView, fragment_list_for_albums);
+                        fragment_transaction.commit();
                 }
             });
         }
