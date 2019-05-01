@@ -6,7 +6,10 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -14,8 +17,8 @@ public class AlbumActivity extends AppCompatActivity {
 
     private Album album;
     private RequestToItunesAPI requestToItunesAPI;
-    public TextView name_album, name_artist, copyright, primary_genre_name, release_date, track_сount;
-
+    private TextView name_album, name_artist, copyright, primary_genre_name, release_date, track_сount;
+    private ImageView label_album;
 
     public class CallBackForUpdateDataAlbum implements com.forasoft.taskforforasoft.Callback{
         // в методе call осуществляется инициализация интерфейса прокручивающегося листа с треками
@@ -44,9 +47,10 @@ public class AlbumActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album);
 
+        label_album = (ImageView)findViewById(R.id.label_for_album);
         name_album = (TextView)findViewById(R.id.name_album);
         name_artist = (TextView)findViewById(R.id.name_artist);
-        copyright = (TextView)findViewById(R.id.copyright);
+//        copyright = (TextView)findViewById(R.id.copyright);
         primary_genre_name = (TextView)findViewById(R.id.primary_genre_name);
         release_date = (TextView)findViewById(R.id.release_date);
         track_сount = (TextView)findViewById(R.id.track_сount);
@@ -59,13 +63,19 @@ public class AlbumActivity extends AppCompatActivity {
             // заполняем поля Activity
             name_album.setText(album.getAlbumCensoredName());
             name_artist.setText(album.getArtistName());
-            copyright.setText(album.getCopyright());
+            // Copyright не успользую, потому что для накоторых альбомов он слишком большой и мешает простмотру страницы
+//            copyright.setText(album.getCopyright());
             primary_genre_name.setText(album.getPrimaryGenreName());
             release_date.setText(album.getReleaseDate());
-            track_сount.setText(album.getTrackCount());
+            track_сount.setText(album.getTrackCount()+"");
+            // асинхронно загружаем картинку для альбома
+            Picasso.with(this)
+                    .load(album.getUrlImage())
+                    .into(label_album);
+
 
             requestToItunesAPI = new RequestToItunesAPI();
-//            requestToItunesAPI.universalRequest("album", album_name, new CallBackForUpdateDataAlbum(), album);
+//            requestToItunesAPI.universalRequest("musicTrack", null, new CallBackForUpdateDataAlbum(), new Integer(album.getIdAlbum()));
         }catch(NullPointerException ex){
             Log.e("null point ex", "intent empty", ex);
         }

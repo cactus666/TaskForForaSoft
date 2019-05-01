@@ -19,6 +19,7 @@
             android:layout_weight="1">
 
             <ImageView
+                android:id="@+id/label_for_album"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_marginLeft="10dp">
@@ -97,24 +98,24 @@
             </TextView>
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/copyright">
-            </TextView>
+        <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_weight="1"-->
+            <!--android:orientation="horizontal">-->
+            <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="@string/copyright">-->
+            <!--</TextView>-->
 
-            <TextView
-                android:id="@+id/copyright"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="">
-            </TextView>
-        </LinearLayout>
+            <!--<TextView-->
+                <!--android:id="@+id/copyright"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="">-->
+            <!--</TextView>-->
+        <!--</LinearLayout>-->
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -162,18 +163,19 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/search_track"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content">
 
             <EditText
                 android:id="@+id/search_field_for_track"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textMultiLine"
+                android:layout_toLeftOf="@+id/clear_text"
+                android:inputType="text"
                 android:cursorVisible="true"
+                android:layout_marginLeft="5dp"
                 android:hint="Search">
             </EditText>
 
@@ -183,12 +185,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
+                android:layout_marginTop="10dp"
                 android:paddingRight="20dp"
+                android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
-                android:title="arr">
+                android:title="clear">
             </ImageView>
 
-        </LinearLayout>
+        </RelativeLayout>
+
+
+
+
+
 
         <ListView
             android:id="@+id/list_with_tracks"

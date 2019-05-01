@@ -110,14 +110,14 @@ public class Album implements Parcelable {
     @Override
     public String toString(){
         return new StringBuilder("albumObject: ")
-                .append(idAlbum)
-                .append(artistName)
-                .append(albumCensoredName)
-                .append(urlImage)
-                .append(trackCount)
-                .append(copyright)
-                .append(primaryGenreName)
-                .append(releaseDate).toString();
+                .append(" id = ").append(idAlbum)
+                .append(" artistName = ").append(artistName)
+                .append(" albumCensoredName = ").append(albumCensoredName)
+                .append(" urlImage = ").append(urlImage)
+                .append(" trackCount = ").append(trackCount)
+                .append(" copyright = ").append(copyright)
+                .append(" primaryGenreName = ").append(primaryGenreName)
+                .append(" releaseDate = ").append(releaseDate).toString();
     }
 
     @Override
