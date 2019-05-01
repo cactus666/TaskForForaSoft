@@ -43,7 +43,7 @@ public class RequestToItunesAPI {
 
 //    example use method  - new RequestToItunesAPI().universalRequest("album", "Нищая страна");
 //                        - new RequestToItunesAPI().universalRequest("musicTrack", "белые хлопья");
-    public void universalRequest(final String entity, String term, final com.forasoft.taskforforasoft.Callback callbackForResult){
+    public void universalRequest(final String entity, String term, final com.forasoft.taskforforasoft.Callback callbackForResult, Integer idAlbum){
         // используем этот метод(чистим url_for_request), по 2 причинам:
         // 1. этот метод не пересоздает массив, как метод delete, а просто заполняет 0
         // 2. если использовать метод delete, то теряется расширяемось, а так первую часть адреса можно вынести в агументы к запросу.
@@ -122,8 +122,14 @@ public class RequestToItunesAPI {
 
 // метод заполнения объекта альбом
     Album fillAlbumObject(JSONObject albumJsonObject){
-        String artistName, collectionCensoredName, artworkUrl60, copyright, primaryGenreName, releaseDate;
+        String idAlbum, artistName, collectionCensoredName, artworkUrl60, copyright, primaryGenreName, releaseDate;
         int trackCount;
+
+        try {
+            idAlbum = albumJsonObject.getString("collectionId");
+        } catch (JSONException e) {
+            idAlbum = null;
+        }
 
         try {
             artistName = albumJsonObject.getString("artistName");
@@ -140,7 +146,7 @@ public class RequestToItunesAPI {
         try {
             artworkUrl60= albumJsonObject.getString("artworkUrl60");
         } catch (JSONException e) {
-            artworkUrl60 = "missing";
+            artworkUrl60 = null;
         }
 
         try {
@@ -167,7 +173,7 @@ public class RequestToItunesAPI {
             releaseDate = "missing";;
         }
 
-        Album album_object = new Album(artistName, collectionCensoredName, artworkUrl60, trackCount, copyright, primaryGenreName, releaseDate);
+        Album album_object = new Album(idAlbum, artistName, collectionCensoredName, artworkUrl60, trackCount, copyright, primaryGenreName, releaseDate);
 
         return album_object;
     }

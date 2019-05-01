@@ -9,6 +9,7 @@ import java.util.List;
 
 public class Album implements Parcelable {
 
+    private String idAlbum;
     private String artistName;
     private String albumCensoredName;
     private String urlImage;
@@ -23,14 +24,16 @@ public class Album implements Parcelable {
     // (например в API YouTube есть параметр part для ограничения объема результатов),
     // так и здесь при первом просмотре альбомов в листе нам не нужна вся информация о нем.
     // оставлю этот конструктор в надежде, что если API сделают лучше, то будет легко расширить функционал приложения...
-    public Album(String artistName, String albumCensoredName, String urlImage){
+    public Album(String idAlbum, String artistName, String albumCensoredName, String urlImage){
+        this.idAlbum = idAlbum;
         this.artistName = artistName;
         this.albumCensoredName = albumCensoredName;
         this.urlImage = urlImage;
     }
 
     // конструктор для создания объекта для страницы альбома
-    public Album(String artistName, String albumCensoredName, String urlImage, int trackCount, String copyright, String primaryGenreName, String releaseDate){
+    public Album(String idAlbum, String artistName, String albumCensoredName, String urlImage, int trackCount, String copyright, String primaryGenreName, String releaseDate){
+        this.idAlbum = idAlbum;
         this.artistName = artistName;
         this.albumCensoredName = albumCensoredName;
         this.urlImage = urlImage;
@@ -41,7 +44,8 @@ public class Album implements Parcelable {
     }
 
 
-    protected Album(Parcel in) {
+    private Album(Parcel in) {
+        idAlbum = in.readString();
         artistName = in.readString();
         albumCensoredName = in.readString();
         urlImage = in.readString();
@@ -62,6 +66,10 @@ public class Album implements Parcelable {
             return new Album[size];
         }
     };
+
+    public String getIdAlbum() {
+        return idAlbum;
+    }
 
     public String getArtistName() {
         return artistName;
@@ -102,6 +110,7 @@ public class Album implements Parcelable {
     @Override
     public String toString(){
         return new StringBuilder("albumObject: ")
+                .append(idAlbum)
                 .append(artistName)
                 .append(albumCensoredName)
                 .append(urlImage)
@@ -118,6 +127,7 @@ public class Album implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(idAlbum);
         dest.writeString(artistName);
         dest.writeString(albumCensoredName);
         dest.writeString(urlImage);

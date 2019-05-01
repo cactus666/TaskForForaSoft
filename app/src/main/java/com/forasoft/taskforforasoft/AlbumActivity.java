@@ -12,7 +12,7 @@ import java.util.List;
 
 public class AlbumActivity extends AppCompatActivity {
 
-    private String album_name;
+    private Album album;
     private RequestToItunesAPI requestToItunesAPI;
     public TextView name_album, name_artist, copyright, primary_genre_name, release_date, track_сount;
 
@@ -52,10 +52,20 @@ public class AlbumActivity extends AppCompatActivity {
         track_сount = (TextView)findViewById(R.id.track_сount);
 
         try {
-            album_name = getIntent().getExtras().getString("album_name");
-            name_album.setText(album_name);
+            // получаем объект Album, он реализует интерфейс Parcelable, чтобы можно было передать его через Intent.
+            // Можно использовать Serializable, но Parcelable работает быстрее с простыми типами данных, такими как int, double, String(объект).
+            album = getIntent().getExtras().getParcelable("album");
+
+            // заполняем поля Activity
+            name_album.setText(album.getAlbumCensoredName());
+            name_artist.setText(album.getArtistName());
+            copyright.setText(album.getCopyright());
+            primary_genre_name.setText(album.getPrimaryGenreName());
+            release_date.setText(album.getReleaseDate());
+            track_сount.setText(album.getTrackCount());
+
             requestToItunesAPI = new RequestToItunesAPI();
-            requestToItunesAPI.universalRequest("album", album_name, new CallBackForUpdateDataAlbum());
+//            requestToItunesAPI.universalRequest("album", album_name, new CallBackForUpdateDataAlbum(), album);
         }catch(NullPointerException ex){
             Log.e("null point ex", "intent empty", ex);
         }

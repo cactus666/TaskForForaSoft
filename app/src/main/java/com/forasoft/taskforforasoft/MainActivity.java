@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
                         Log.d("album", album_name);
                         // проверяем полученную строку на наличие символов, и если они есть ищем альбомы
                         if(album_name.length() != 0){
-                            requestToItunesAPI.universalRequest("album", album_name, new CallBackForGettingAlbumsAndCreateList());
+                            requestToItunesAPI.universalRequest("album", album_name, new CallBackForGettingAlbumsAndCreateList(), null);
                         }
                     }
                 });
