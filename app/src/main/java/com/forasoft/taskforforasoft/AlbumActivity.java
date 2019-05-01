@@ -77,49 +77,6 @@ public class AlbumActivity extends AppCompatActivity {
 
 
 
-class AsyncTaskForCallToItunesAPI extends AsyncTask<Void, Integer, Void> {
-
-    Album album;
-    Context context;
-    RequestToItunesAPI requestToItunesAPI = new RequestToItunesAPI();
-String name;
-
-    public AsyncTaskForCallToItunesAPI(String name, Context context) {
-        this.name = name;
-        this.context = context;
-    }
-
-    @Override
-    protected void onPreExecute() {
-        Log.d("position", "2");
-    }
-
-    @Override
-    protected Void doInBackground(Void... voids) {
-        Log.d("position", "3");
-
-        Log.d("position", "4");
-        return null;
-    }
-
-    @Override
-    protected void onPostExecute(Void v) {
-        Log.d("position", "5");
-
-    }
-
-    @Override
-    protected void onCancelled(){
-        super.onCancelled();
-        Log.d("position", "6");
-        // можно что-то сделать при выходе, например вызвать метод добавления сообщения в комментарии "Всем пока"
-    }
-}
-
-
-
-
-
 
 
 

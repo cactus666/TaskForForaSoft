@@ -214,9 +214,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     if(type){
-                        for(int i=0; i<result_list.size(); i++){
-                            System.out.println(result_list.get(i));
-                        }
+
                     }else{
                         Log.e("fail", "must be search by album");
                     }
