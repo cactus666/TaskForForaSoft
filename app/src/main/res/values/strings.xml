@@ -13,4 +13,5 @@
     <string name="primary_genre_name">Primary genre name: </string>
 
     <string name="no_matching_albums_available">Нет подходящих альбомов:(</string>
+    <string name="error_album_not_found">error_album_not_found</string>
 </resources>

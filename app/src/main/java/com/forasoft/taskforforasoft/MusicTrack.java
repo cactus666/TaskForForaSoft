@@ -3,8 +3,8 @@ package com.forasoft.taskforforasoft;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.Serializable;
 
+// раньше использовался для созданее листа, тепери не нужен:(
 public class MusicTrack implements Parcelable {
     private String trackCensoredName;
     private int trackTimeMillis;

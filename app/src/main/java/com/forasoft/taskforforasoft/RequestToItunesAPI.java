@@ -1,8 +1,10 @@
 package com.forasoft.taskforforasoft;
 
-import android.content.Context;
+import android.os.Build;
+import android.os.Parcelable;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
-import android.widget.TextView;
+import android.util.TimeUtils;
 
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
@@ -12,8 +14,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class RequestToItunesAPI {
 
@@ -88,6 +93,7 @@ public class RequestToItunesAPI {
                 Log.e("fail_request", e.toString());
             }
 
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onResponse(Response response) throws IOException {
                 try {
@@ -102,6 +108,11 @@ public class RequestToItunesAPI {
                         Album new_album;
                         // получпем количество найденных альбомов
                         int countAlbums = rootJsonObject.getInt("resultCount");
+                        // проверяются совпадения, если есть хотябы 1 альбом, то все хорошо, иначе возвращаем callback'у null
+                        if(countAlbums == 0){
+                            callbackForResult.callForAlbum(null);
+                            return;
+                        }
                         // вытягиваем из rootJsonObject json массив, в котором лежат все json объекты (альбомы)
                         resJsonArray = rootJsonObject.getJSONArray("results");
                         JSONObject albumJsonObject;
@@ -116,26 +127,32 @@ public class RequestToItunesAPI {
                                 result_list.add(new_album);
                             }
                         }
-                        callbackForResult.call(result_list);
+                        result_list.sort(new Comparator() {
+                            @Override
+                            public int compare(Object o1, Object o2) {
+                              return ((Album)o1).getAlbumCensoredName().compareToIgnoreCase(((Album)o2).getAlbumCensoredName());
+                            }
+                        });
+                        callbackForResult.callForAlbum(result_list);
                     }else if(entity.intern() == "song"){
-                        MusicTrack new_track;
+                        Map<String, Object> new_track;
                         // получпем количество найденных треков
                         int countTrack = rootJsonObject.getInt("resultCount");
                         // вытягиваем из rootJsonObject json массив, в котором лежат все json объекты (треки)
                         resJsonArray = rootJsonObject.getJSONArray("results");
                         JSONObject trackJsonObject;
                         // создаем лист объектов, используем конкретную реализацию - ArrayList, т.к. подкопотом там массив, сразу задаем капасити, чтобы не расширять массив в двое
-                        List result_list = new ArrayList<>(countTrack);
+                        List<Map<String, Object>> result_list = new ArrayList<>(countTrack);
                         // проходимся по каждому треку и вызываем метод обработки трека, пропускае первый, т.к. это альбом
                         for(int i = 1; i < countTrack; i++){
                             trackJsonObject = resJsonArray.getJSONObject(i);
-                            new_track = fillMusicTrackObject(trackJsonObject);
+                            new_track = fillMusicTrackMap(trackJsonObject);
                             if(new_track != null) {
-                                // вызываем функцию заполнения объекта Album
+                                // вызываем функцию заполнения объекта MusicTrack
                                 result_list.add(new_track);
                             }
                         }
-                        callbackForResult.call(result_list);
+                        callbackForResult.callForTrack(result_list);
                     }else{
                         Log.e("err", "check request parameter(entity)");
                     }
@@ -207,33 +224,36 @@ public class RequestToItunesAPI {
         return album_object;
     }
 
-    // метод заполнения объекта трек
-    MusicTrack fillMusicTrackObject(JSONObject albumJsonObject){
-        String trackCensoredName;
-        int trackTimeMillis, trackNumber;
+    // метод заполнения map для трека
+    Map<String, Object>  fillMusicTrackMap(JSONObject albumJsonObject){
+        Map<String, Object> track_map = new HashMap<>();
 
         try {
-            trackCensoredName = albumJsonObject.getString("trackCensoredName");
+            track_map.put("track_name", albumJsonObject.getString("trackCensoredName"));
         } catch (JSONException e) {
             // безсмысленно выводить трек, если нет названия
             return null;
         }
 
         try {
-            trackTimeMillis = albumJsonObject.getInt("trackTimeMillis");
+            track_map.put("track_time", formationTimePlay(albumJsonObject.getInt("trackTimeMillis")));
         } catch (JSONException e) {
-            trackTimeMillis = 0;
+            track_map.put("track_time", "0");
         }
 
         try {
-            trackNumber = albumJsonObject.getInt("trackNumber");
+            track_map.put("track_number", albumJsonObject.getInt("trackNumber"));
         } catch (JSONException e) {
-            trackNumber = 0;
+            track_map.put("track_number", "0");
         }
 
-        MusicTrack track_object = new MusicTrack(trackCensoredName, trackTimeMillis, trackNumber);
+        return track_map;
+    }
 
-        return track_object;
+    // метод формирующий время проишрывания трека
+    String formationTimePlay(int millis){
+        // пока никто не видет можно делать канкатенацию строк чере "+"
+        return TimeUnit.MILLISECONDS.toMinutes(millis) + ":" + TimeUnit.MILLISECONDS.toSeconds(millis);
     }
 }
 

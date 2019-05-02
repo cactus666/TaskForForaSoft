@@ -196,9 +196,6 @@
 
 
 
-
-
-
         <ListView
             android:id="@+id/list_with_tracks"
             android:layout_width="fill_parent"

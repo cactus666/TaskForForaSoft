@@ -2,8 +2,11 @@ package com.forasoft.taskforforasoft;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.widget.SimpleAdapter;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -40,7 +43,17 @@ public class Album implements Parcelable {
         this.trackCount = trackCount;
         this.copyright = copyright;
         this.primaryGenreName = primaryGenreName;
-        this.releaseDate = releaseDate;
+        // формирую дату
+
+        SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
+        SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = new Date();
+        try {
+            date = simpleDateFormat1.parse(releaseDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        this.releaseDate = simpleDateFormat2.format(date);
     }
 
 

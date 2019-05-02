@@ -7,11 +7,14 @@ import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
+import java.util.Map;
 
 public class AlbumActivity extends AppCompatActivity {
 
@@ -19,23 +22,28 @@ public class AlbumActivity extends AppCompatActivity {
     private RequestToItunesAPI requestToItunesAPI;
     private TextView name_album, name_artist, copyright, primary_genre_name, release_date, track_сount;
     private ImageView label_album;
+    private ListView list_with_tracks;
 
     public class CallBackForCreateTrackList implements com.forasoft.taskforforasoft.Callback{
-        // в методе call осуществляется инициализация интерфейса прокручивающегося листа с треками
+        // в методе callForTrack осуществляется инициализация интерфейса прокручивающегося листа с треками
         @Override
-        public void call(final List<Parcelable> result_list) {
+        public void callForTrack(final List<Map<String, Object>> result_list) {
             AlbumActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-
-//                        name_artist.setText(result[0]);
-//                        copyright.setText(result[1]);
-//                        primary_genre_name.setText(result[2]);
-//                        release_date.setText(result[3]);
-//                        track_сount.setText(result[4]);
-
+                    String[] from = {"track_number", "track_name", "track_time"};
+                    int[] to = {R.id.track_number, R.id.track_name, R.id.track_time};
+                    // создаем адаптер
+                    SimpleAdapter simpleAdapter = new SimpleAdapter(AlbumActivity.this, result_list, R.layout.item_for_list_with_tracks, from, to);
+                    // присваиваем адаптер
+                    list_with_tracks.setAdapter(simpleAdapter);
                 }
             });
+        }
+
+        @Override
+        public void callForAlbum(List<Parcelable> result_list) {
+            // ничего здесь писать не нужно
         }
     }
 
@@ -52,6 +60,10 @@ public class AlbumActivity extends AppCompatActivity {
         primary_genre_name = (TextView)findViewById(R.id.primary_genre_name);
         release_date = (TextView)findViewById(R.id.release_date);
         track_сount = (TextView)findViewById(R.id.track_сount);
+        list_with_tracks = (ListView)findViewById(R.id.list_with_tracks);
+
+        // меняю титульник на "Album"
+        getSupportActionBar().setTitle("Album");
 
         try {
             // получаем объект Album, он реализует интерфейс Parcelable, чтобы можно было передать его через Intent.
