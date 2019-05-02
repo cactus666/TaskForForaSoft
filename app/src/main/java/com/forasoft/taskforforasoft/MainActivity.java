@@ -34,12 +34,6 @@ public class MainActivity extends AppCompatActivity {
     private InputMethodManager inputManager;
     private RequestToItunesAPI requestToItunesAPI;
     private android.support.v4.app.FragmentTransaction fragment_transaction;
-
-    String[] items;
-    ArrayList<String> listItems;
-    ArrayAdapter<String> adapter;
-    ListView listView;
-
     private FragmentListForAlbums fragment_list_for_albums;
     private ErrorSearchFragment error_search_fragment;
 
@@ -74,35 +68,6 @@ public class MainActivity extends AppCompatActivity {
         requestToItunesAPI = new RequestToItunesAPI();
     }
 
-//    public void searchItem(String textToSearch){
-//        for(String item:items){
-//            String textToSearch1 = textToSearch.toLowerCase();
-//
-//            if(!item.toLowerCase().contains(textToSearch1)){
-//                listItems.remove(item);
-//            }
-//        }
-//        adapter.notifyDataSetChanged();
-//    }
-//
-//    public void initList(){
-//        items=new String[]{"Java","JavaScript","C#","PHP", "Нищая страна", "Python", "C", "SQL", "Ruby", "Objective-C", "JavA","JAVvScript","C1#","PHP", "СC++", "Py23thon", "C", "SQDFL", "Rub", "ObjectDFDive-C"};
-//        listItems=new ArrayList<>(Arrays.asList(items));
-//        adapter=new ArrayAdapter<String>(this, R.layout.item_for_list_with_albums, R.id.txtitem, listItems);
-//        listView.setAdapter(adapter);
-//
-//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-////                Log.d("value", adapter.getItem(position));
-//                Intent intent = new Intent(getApplicationContext(), AlbumActivity.class);
-//                intent.putExtra("album_name", adapter.getItem(position));
-//                startActivity(intent);
-//            }
-//        });
-//
-//
-//    }
-
     // сохранение данных перед Pause.
     // например при повороте или смене языка происходит пересоздание активности и нужно сохранить данные
     @Override
@@ -133,152 +98,119 @@ public class MainActivity extends AppCompatActivity {
                 // устанавливаем титульник и делаем видимым группу group_start из файла R.menu.menu_start_or_search
                 getSupportActionBar().setDisplayShowTitleEnabled(true);
                 menu.setGroupVisible(R.id.group_start, true);
-//                menu.setGroupVisible(R.id.group_search, false);
                 break;
             case 1:
                 // убираем титульник и делаем не видимой группу group_start из menu.menu_start
                 getSupportActionBar().setDisplayShowTitleEnabled(false);
                 menu.setGroupVisible(R.id.group_start, false);
-//                menu.setGroupVisible(R.id.group_search, false);
 
                 // получаем инфлейтор и используем его чтобы заполнить View объект содержимым файла R.layout.search_menu
                 LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 View newBar = inflater.inflate(R.layout.search_menu, null);
 
                 // выставляем слушатель на стрелку назад
-                newBar.findViewById(R.id.back_arrow).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if(inputManager != null) {
-                            // закрытие клавиатуры до того, как уберем View(newBar) из ActionBar'a!
-                            inputManager.hideSoftInputFromWindow(search_field.getWindowToken(), 0);
-                        }
-                        // убираем созданный ранее ActionBar с (стрелкой и EditText)
-                        getSupportActionBar().setCustomView(null);
-
-                        // выставляем следующее состояние, теперь оно будет 0 - вернемся к стартовому состоянию
-                        nextStateBar = 0;
-                        // мы должны знать, что его уже нет, и нет смысла сохранять его поле, ведь это может привести к ошибке
-                        search_field = null;
-
-                        // убираем лист из альбомов или же предупреждение о том, что альбомов нет
-                        fragment_transaction = getSupportFragmentManager().beginTransaction();
-                        if(error_search_fragment != null){
-                            fragment_transaction.remove(error_search_fragment);
-                            // для того, чтобы если мы вернемся к состоянию 1 и попытаемся повернуть экран, то fragment неужастся сохранить, т.к. он уе удален в строку выше
-                            error_search_fragment = null;
-                        }
-                        if(fragment_list_for_albums != null) {
-                            fragment_transaction.remove(fragment_list_for_albums);
-                            // для того, чтобы если мы вернемся к состоянию 1 и попытаемся повернуть экран, то fragment неужастся сохранить, т.к. он уе удален в строку выше
-                            fragment_list_for_albums = null;
-                        }
-                        fragment_transaction.commit();
-
-                        // метод перерисовки меню/ActionBar, вызывается метод onCreateOptionsMenu
-                        invalidateOptionsMenu();
-                    }
-                });
+                newBar.findViewById(R.id.back_arrow).setOnClickListener(on_click_listener_for_newBar);
 
                 // находим EditText из newBar'a
                 search_field = (EditText)newBar.findViewById(R.id.search_field);
-                // убираем видимую черточку снизу у EditText
-                search_field.setBackgroundResource(android.R.color.transparent);
-                // устанавливаем значение, если оно не null, что значит, что активити пересоздали
-                search_field.setText(search_field_after);
+                settingSearchField(search_field);
 
-                search_field.setOnEditorActionListener(new EditText.OnEditorActionListener() {
-                    @Override
-                    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-//                        if (actionId == EditorInfo.IME_ACTION_SEARCH ||
-//                                actionId == EditorInfo.IME_ACTION_DONE ||
-//                                event.getAction() == KeyEvent.ACTION_DOWN &&
-//                                        event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-//                            if (!event.isShiftPressed()) {
-
-                        if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-
-                            // получаем строку без пробелов(в начале и в конце) из поля ввода(search_field)
-                            String album_name = search_field.getText().toString().trim();
-                            Log.d("album", album_name);
-                            // проверяем полученную строку на наличие символов, и если они есть ищем альбомы
-                            if(album_name.length() != 0){
-                                requestToItunesAPI.universalRequest("album", album_name, new CallBackForGettingAlbumsAndCreateList(), null);
-                            }
-
-                            if(inputManager != null) {
-                                // закрытие клавиатуры, что бы не мешала просмотру результатов
-                                inputManager.hideSoftInputFromWindow(search_field.getWindowToken(), 0);
-                            }
-
-                            // возвращаем true если нет действия
-                            return true;
-                        }
-                        // возвращаем false если нет действия
-                        return false;
-                    }
-                });
 
                 // получаем ImageView clear и устанавливаем для него слушатель, в котором при нажатии отчищаем поле ввода
-                ((ImageView) newBar.findViewById(R.id.clear)).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // отчищаем поле ввода
-                        search_field.setText("");
-                    }
-                });
+                ((ImageView) newBar.findViewById(R.id.clear)).setOnClickListener(on_click_listener_for_clear);
 
-                // дает фокус EditText'у
-                search_field.requestFocus();
-//                search_field.setCursorVisible(true);
-//                search_field.setFocusable(true);
-//                search_field.setFocusableInTouchMode(true);
+                // открывает клавиатуру, если это возможно(inputManager != null)
+                if(inputManager != null)  inputManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 
-                if(inputManager != null) {
-                    // открывает клавиатуру
-                    inputManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-                }
-
-                // получаем SupportActionBar для монипуляции с ActionBar и выводим в него тогль newBar
+                // получаем SupportActionBar для монипуляции с ActionBar и выводим в него newBar
                 ActionBar supportActionBar = getSupportActionBar();
                 supportActionBar.setDisplayHomeAsUpEnabled(false);
                 supportActionBar.setDisplayShowHomeEnabled (false);
                 supportActionBar.setDisplayShowCustomEnabled(true);
                 supportActionBar.setDisplayShowTitleEnabled(false);
                 supportActionBar.setCustomView(newBar);
-//                initList();
-
-
-//                search_field.addTextChangedListener(new TextWatcher() {
-//
-//                    @Override
-//                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//                        Log.i("info_beforeTextChanged", s+"__"+start+"__"+count+"__"+after);
-//                    }
-//
-//                    @Override
-//                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                        Log.i("info_onTextChanged", s+"__"+start+"__"+count+"__"+before);
-//                        if(s.toString().equals("")){
-//                            // reset listview
-//                            initList();
-//                        } else {
-//                            // perform search
-//                            searchItem(s.toString());
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void afterTextChanged(Editable s) {
-//                        Log.i("info_afterTextChanged", s+"");
-//                    }
-//
-//                });
                 break;
         }
-
         return true;
     }
+
+    void settingSearchField(EditText search_field){
+        // убираем видимую черточку снизу у EditText
+        search_field.setBackgroundResource(android.R.color.transparent);
+        // устанавливаем значение, если оно не null, что значит, что активити пересоздали
+        search_field.setText(search_field_after);
+        search_field.setOnEditorActionListener(on_editor_action_listener_for_search);
+        // дает фокус EditText'у
+        search_field.requestFocus();
+    }
+
+    View.OnClickListener on_click_listener_for_clear = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            // отчищаем поле ввода
+            search_field.setText("");
+        }
+    };
+
+    EditText.OnEditorActionListener on_editor_action_listener_for_search = new EditText.OnEditorActionListener() {
+        @Override
+        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+
+                // получаем строку без пробелов(в начале и в конце) из поля ввода(search_field)
+                String album_name = search_field.getText().toString().trim();
+                Log.d("album", album_name);
+                // проверяем полученную строку на наличие символов, и если они есть ищем альбомы
+                if(album_name.length() != 0){
+                    requestToItunesAPI.universalRequest("album", album_name, new CallBackForGettingAlbumsAndCreateList(), null);
+                }
+
+                if(inputManager != null) {
+                    // закрытие клавиатуры, что бы не мешала просмотру результатов
+                    inputManager.hideSoftInputFromWindow(search_field.getWindowToken(), 0);
+                }
+
+                // возвращаем true если нет действия
+                return true;
+            }
+            // возвращаем false если нет действия
+            return false;
+        }
+    };
+
+    View.OnClickListener on_click_listener_for_newBar = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if(inputManager != null) {
+                // закрытие клавиатуры до того, как уберем View(newBar) из ActionBar'a!
+                inputManager.hideSoftInputFromWindow(search_field.getWindowToken(), 0);
+            }
+            // убираем созданный ранее ActionBar с (стрелкой и EditText)
+            getSupportActionBar().setCustomView(null);
+
+            // выставляем следующее состояние, теперь оно будет 0 - вернемся к стартовому состоянию
+            nextStateBar = 0;
+            // мы должны знать, что его уже нет, и нет смысла сохранять его поле, ведь это может привести к ошибке
+            search_field = null;
+
+            // убираем лист из альбомов или же предупреждение о том, что альбомов нет
+            fragment_transaction = getSupportFragmentManager().beginTransaction();
+            if(error_search_fragment != null){
+                fragment_transaction.remove(error_search_fragment);
+                // для того, чтобы если мы вернемся к состоянию 1 и попытаемся повернуть экран, то fragment неужастся сохранить, т.к. он уе удален в строку выше
+                error_search_fragment = null;
+            }
+            if(fragment_list_for_albums != null) {
+                fragment_transaction.remove(fragment_list_for_albums);
+                // для того, чтобы если мы вернемся к состоянию 1 и попытаемся повернуть экран, то fragment неужастся сохранить, т.к. он уе удален в строку выше
+                fragment_list_for_albums = null;
+            }
+            fragment_transaction.commit();
+
+            // метод перерисовки меню/ActionBar, вызывается метод onCreateOptionsMenu
+            invalidateOptionsMenu();
+        }
+    };
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

@@ -58,32 +58,12 @@ public class RequestToItunesAPI {
     // 2) entity = musicTrack; id = idAlbum (поиск по id, полученном ранее)
 
     public void universalRequest(final String entity, String term, final com.forasoft.taskforforasoft.Callback callbackForResult, Integer idAlbum){
-        // используем этот метод(чистим url_for_request), по 2 причинам:
-        // 1. этот метод не пересоздает массив, как метод delete, а просто заполняет 0
-        // 2. если использовать метод delete, то теряется расширяемось, а так первую часть адреса можно вынести в агументы к запросу.
-        url_for_request.setLength(0);
+        String url = createURL(entity, idAlbum, term);
+        if(url == null){ return; }
 
-        // генерируется url по агрументам
-        if(entity.intern() == "song"){
-            if(idAlbum == null)
-                return;
-            url_for_request
-                    .append("https://itunes.apple.com/lookup?id=")
-                    .append(idAlbum)
-                    .append("&entity=")
-                    .append(entity);
-        }else{
-            if(term == null)
-                return;
-            url_for_request
-                    .append("https://itunes.apple.com/search?media=music&entity=")
-                    .append(entity)
-                    .append("&term=")
-                    .append(term);
-        }
-
-        com.squareup.okhttp.Request request = new com.squareup.okhttp.Request.Builder()
-                .url(url_for_request.toString())
+        // отправляем запрос
+        final com.squareup.okhttp.Request request = new com.squareup.okhttp.Request.Builder()
+                .url(url)
                 .get()
                 .build();
 
@@ -98,14 +78,9 @@ public class RequestToItunesAPI {
             public void onResponse(Response response) throws IOException {
                 try {
                     Log.i("url", url_for_request.toString());
-                    // получаем результат
-                    String result = response.body().string();
-//                    Log.d("result", result);
-                    // конвертируем полученный результат в json представление
-                    rootJsonObject = new JSONObject(result);
-//                    Log.d("result", rootJsonObject.toString());
+                    // получаем результат и конвертируем полученный результат в json представление
+                    rootJsonObject = new JSONObject(response.body().string());
                     if(entity.intern() == "album"){
-                        Album new_album;
                         // получпем количество найденных альбомов
                         int countAlbums = rootJsonObject.getInt("resultCount");
                         // проверяются совпадения, если есть хотябы 1 альбом, то все хорошо, иначе возвращаем callback'у null
@@ -113,20 +88,11 @@ public class RequestToItunesAPI {
                             callbackForResult.callForAlbum(null);
                             return;
                         }
-                        // вытягиваем из rootJsonObject json массив, в котором лежат все json объекты (альбомы)
-                        resJsonArray = rootJsonObject.getJSONArray("results");
-                        JSONObject albumJsonObject;
-                        // создаем лист объектов, используем конкретную реализацию - ArrayList, т.к. подкопотом там массив, сразу задаем капасити, чтобы не расширять массив в двое
-                        List result_list = new ArrayList<>(countAlbums);
-                        // проходимся по каждому альбому и вызываем метод обработки альбома
-                        for(int i = 0; i < countAlbums; i++){
-                            albumJsonObject = resJsonArray.getJSONObject(i);
-                            new_album = fillAlbumObject(albumJsonObject);
-                            if(new_album != null) {
-                                // вызываем функцию заполнения объекта Album
-                                result_list.add(new_album);
-                            }
-                        }
+                        // создаем лист объектов
+                         List result_list = createResultListForAlbum(countAlbums, rootJsonObject);
+                         if(result_list == null) { return; }
+
+                         // сортирую в алфавитном порядке
                         result_list.sort(new Comparator() {
                             @Override
                             public int compare(Object o1, Object o2) {
@@ -135,24 +101,9 @@ public class RequestToItunesAPI {
                         });
                         callbackForResult.callForAlbum(result_list);
                     }else if(entity.intern() == "song"){
-                        Map<String, Object> new_track;
-                        // получпем количество найденных треков
-                        int countTrack = rootJsonObject.getInt("resultCount");
-                        // вытягиваем из rootJsonObject json массив, в котором лежат все json объекты (треки)
-                        resJsonArray = rootJsonObject.getJSONArray("results");
-                        JSONObject trackJsonObject;
-                        // создаем лист объектов, используем конкретную реализацию - ArrayList, т.к. подкопотом там массив, сразу задаем капасити, чтобы не расширять массив в двое
-                        List<Map<String, Object>> result_list = new ArrayList<>(countTrack);
-                        // проходимся по каждому треку и вызываем метод обработки трека, пропускае первый, т.к. это альбом
-                        for(int i = 1; i < countTrack; i++){
-                            trackJsonObject = resJsonArray.getJSONObject(i);
-                            new_track = fillMusicTrackMap(trackJsonObject, i);
-                            if(new_track != null) {
-                                // вызываем функцию заполнения объекта MusicTrack
-                                // i задает номер трека, т.к. то что получаю в реквесте бывает имеет одинаковые значения
-                                result_list.add(new_track);
-                            }
-                        }
+                        // создаем лист объектов
+                        List<Map<String, Object>> result_list = createResultListForTrack(rootJsonObject);
+                        if(result_list == null){ return; }
                         callbackForResult.callForTrack(result_list);
                     }else{
                         Log.e("err", "check request parameter(entity)");
@@ -164,6 +115,33 @@ public class RequestToItunesAPI {
         });
     }
 
+
+    String createURL(String entity, Integer idAlbum, String term){
+        // используем этот метод(чистим url_for_request), по 2 причинам:
+        // 1. этот метод не пересоздает массив, как метод delete, а просто заполняет 0
+        // 2. если использовать метод delete, то теряется расширяемось, а так первую часть адреса можно вынести в агументы к запросу.
+        url_for_request.setLength(0);
+
+        // генерируется url по агрументам
+        if(entity.intern() == "song"){
+            if(idAlbum == null)
+                return null;
+            url_for_request
+                    .append("https://itunes.apple.com/lookup?id=")
+                    .append(idAlbum)
+                    .append("&entity=")
+                    .append(entity);
+        }else{
+            if(term == null)
+                return null;
+            url_for_request
+                    .append("https://itunes.apple.com/search?media=music&entity=")
+                    .append(entity)
+                    .append("&term=")
+                    .append(term);
+        }
+        return url_for_request.toString();
+    }
 
 // метод заполнения объекта альбом
     Album fillAlbumObject(JSONObject albumJsonObject){
@@ -242,12 +220,6 @@ public class RequestToItunesAPI {
             track_map.put("track_time", "0");
         }
 
-//        try {
-//            track_map.put("track_number", albumJsonObject.getInt("trackNumber"));
-//        } catch (JSONException e) {
-//            track_map.put("track_number", "0");
-//        }
-
         track_map.put("track_number", position);
 
         return track_map;
@@ -257,6 +229,60 @@ public class RequestToItunesAPI {
     String formationTimePlay(int millis){
         // пока никто не видет можно делать канкатенацию строк чере "+"
         return TimeUnit.MILLISECONDS.toMinutes(millis) + ":" + TimeUnit.MILLISECONDS.toSeconds(millis);
+    }
+
+    // метод создания result_list из rootJsonObject для листа из альбомов
+    List createResultListForAlbum(int countAlbums, JSONObject rootJsonObject){
+        // создаем лист объектов, используем конкретную реализацию - ArrayList, т.к. подкопотом там массив, сразу задаем капасити, чтобы не расширять массив в двое
+        List result_list = new ArrayList<>(countAlbums);
+        Album new_album;
+        JSONObject albumJsonObject;
+        try {
+            // вытягиваем из rootJsonObject json массив, в котором лежат все json объекты (альбомы)
+            resJsonArray = rootJsonObject.getJSONArray("results");
+            // проходимся по каждому альбому и вызываем метод обработки альбома
+            for (int i = 0; i < countAlbums; i++) {
+                albumJsonObject = resJsonArray.getJSONObject(i);
+                new_album = fillAlbumObject(albumJsonObject);
+                if (new_album != null) {
+                    // вызываем функцию заполнения объекта Album
+                    result_list.add(new_album);
+                }
+            }
+        }catch (JSONException ex) {
+            Log.e("err", "error with parse json result for album", ex);
+        }
+        return result_list;
+    }
+
+    // метод создания result_list из rootJsonObject для листа из треков
+    List<Map<String, Object>> createResultListForTrack(JSONObject rootJsonObject){
+        Map<String, Object> new_track;
+        JSONObject trackJsonObject;
+        List<Map<String, Object>> result_list = null;
+
+        try {
+            // получпем количество найденных треков
+            int countTrack = rootJsonObject.getInt("resultCount");
+            // вытягиваем из rootJsonObject json массив, в котором лежат все json объекты (треки)
+            resJsonArray = rootJsonObject.getJSONArray("results");
+
+            // создаем лист объектов, используем конкретную реализацию - ArrayList, т.к. подкопотом там массив, сразу задаем капасити, чтобы не расширять массив в двое
+            result_list = new ArrayList<>(countTrack);
+            // проходимся по каждому треку и вызываем метод обработки трека, пропускае первый, т.к. это альбом
+            for (int i = 1; i < countTrack; i++) {
+                trackJsonObject = resJsonArray.getJSONObject(i);
+                new_track = fillMusicTrackMap(trackJsonObject, i);
+                if (new_track != null) {
+                    // вызываем функцию заполнения объекта MusicTrack
+                    // i задает номер трека, т.к. то что получаю в реквесте бывает имеет одинаковые значения
+                    result_list.add(new_track);
+                }
+            }
+        }catch(JSONException ex){
+            Log.e("err", "error with parse json result for track", ex);
+        }
+        return result_list;
     }
 }
 

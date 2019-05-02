@@ -1,7 +1,5 @@
 package com.forasoft.taskforforasoft;
 
-import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
@@ -94,19 +92,3 @@ public class AlbumActivity extends AppCompatActivity {
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
