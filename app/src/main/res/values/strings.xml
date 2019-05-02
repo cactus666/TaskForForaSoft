@@ -1,4 +1,6 @@
 <resources>
+    <string name="кнопка_сделать_хорошо">Лунная призма! Дай мне силу и работу</string>
+
     <string name="app_name">TaskForForaSoft</string>
     <string name="search_field">Search</string>
     <string name="album">Album</string>
@@ -14,4 +16,5 @@
 
     <string name="no_matching_albums_available">Нет подходящих альбомов:(</string>
     <string name="error_album_not_found">error_album_not_found</string>
+    <string name="music_tracks">Music tracks</string>
 </resources>

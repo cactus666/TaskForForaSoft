@@ -59,7 +59,7 @@ public class AlbumActivity extends AppCompatActivity {
 //        copyright = (TextView)findViewById(R.id.copyright);
         primary_genre_name = (TextView)findViewById(R.id.primary_genre_name);
         release_date = (TextView)findViewById(R.id.release_date);
-        track_сount = (TextView)findViewById(R.id.track_сount);
+//        track_сount = (TextView)findViewById(R.id.track_сount);
         list_with_tracks = (ListView)findViewById(R.id.list_with_tracks);
 
         // меняю титульник на "Album"
@@ -78,7 +78,8 @@ public class AlbumActivity extends AppCompatActivity {
             primary_genre_name.setText(album.getPrimaryGenreName());
             release_date.setText(album.getReleaseDate());
             // т.к в результате получаем кол. треков в альбоме + сам альбом, то нужно вычесть 1, и получится кол. песен
-            track_сount.setText((album.getTrackCount()-1)+"");
+            // track_count не успользую, потому что для накоторых альбомов он не считает кол повторных треков(перезаливок), но выводит их в лист, что очень странно видеть
+//            track_сount.setText((album.getTrackCount()-1)+"");
             // асинхронно загружаем картинку для альбома
             Picasso.with(this)
                     .load(album.getUrlImage())

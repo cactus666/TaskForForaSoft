@@ -29,6 +29,7 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
 
     private EditText search_field;
+    private String search_field_after;
     private int nextStateBar = 0;
     private InputMethodManager inputManager;
     private RequestToItunesAPI requestToItunesAPI;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private FragmentListForAlbums fragment_list_for_albums;
     private ErrorSearchFragment error_search_fragment;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +51,23 @@ public class MainActivity extends AppCompatActivity {
 
         inputManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
 
+        if (savedInstanceState != null) {
+            nextStateBar = savedInstanceState.getInt("nextStateBar");
+            search_field_after = savedInstanceState.getString("text_from_search_field");
+
+            //Restore the fragment instance
+            fragment_list_for_albums = (FragmentListForAlbums) getSupportFragmentManager().getFragment(savedInstanceState, "fragment_list_for_albums");
+            error_search_fragment = (ErrorSearchFragment) getSupportFragmentManager().getFragment(savedInstanceState, "error_search_fragment");
+
+            fragment_transaction = getSupportFragmentManager().beginTransaction();
+            if(error_search_fragment != null){
+                fragment_transaction.replace(R.id.fragmentList, error_search_fragment);
+            }else if(fragment_list_for_albums != null){
+                fragment_transaction.replace(R.id.fragmentList, fragment_list_for_albums);
+            }
+            fragment_transaction.commit();
+
+        }
 
 
 //        listView=(ListView)findViewById(R.id.listView);
@@ -83,6 +102,26 @@ public class MainActivity extends AppCompatActivity {
 //
 //
 //    }
+
+    // сохранение данных перед Pause.
+    // например при повороте или смене языка происходит пересоздание активности и нужно сохранить данные
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("nextStateBar", nextStateBar);
+
+        // сохраняем те объекты, что не null
+        if(search_field != null)
+            outState.putString("text_from_search_field", search_field.getText().toString());
+
+        //Save the fragments instance
+        // по условию, что прописано в callForAlbum только один фрагмент может быть не null или ниодного(если мы находимся в состоянии 1, где еще не появились фрагменты связанные с листом)
+        if(fragment_list_for_albums != null)
+            getSupportFragmentManager().putFragment(outState, "fragment_list_for_albums", fragment_list_for_albums);
+        else if(error_search_fragment != null)
+            getSupportFragmentManager().putFragment(outState, "error_search_fragment", error_search_fragment);
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -119,11 +158,21 @@ public class MainActivity extends AppCompatActivity {
 
                         // выставляем следующее состояние, теперь оно будет 0 - вернемся к стартовому состоянию
                         nextStateBar = 0;
+                        // мы должны знать, что его уже нет, и нет смысла сохранять его поле, ведь это может привести к ошибке
+                        search_field = null;
 
                         // убираем лист из альбомов или же предупреждение о том, что альбомов нет
                         fragment_transaction = getSupportFragmentManager().beginTransaction();
-                        if(error_search_fragment != null) fragment_transaction.remove(error_search_fragment);
-                        if(fragment_list_for_albums != null) fragment_transaction.remove(fragment_list_for_albums);
+                        if(error_search_fragment != null){
+                            fragment_transaction.remove(error_search_fragment);
+                            // для того, чтобы если мы вернемся к состоянию 1 и попытаемся повернуть экран, то fragment неужастся сохранить, т.к. он уе удален в строку выше
+                            error_search_fragment = null;
+                        }
+                        if(fragment_list_for_albums != null) {
+                            fragment_transaction.remove(fragment_list_for_albums);
+                            // для того, чтобы если мы вернемся к состоянию 1 и попытаемся повернуть экран, то fragment неужастся сохранить, т.к. он уе удален в строку выше
+                            fragment_list_for_albums = null;
+                        }
                         fragment_transaction.commit();
 
                         // метод перерисовки меню/ActionBar, вызывается метод onCreateOptionsMenu
@@ -135,42 +184,47 @@ public class MainActivity extends AppCompatActivity {
                 search_field = (EditText)newBar.findViewById(R.id.search_field);
                 // убираем видимую черточку снизу у EditText
                 search_field.setBackgroundResource(android.R.color.transparent);
+                // устанавливаем значение, если оно не null, что значит, что активити пересоздали
+                search_field.setText(search_field_after);
 
                 search_field.setOnEditorActionListener(new EditText.OnEditorActionListener() {
                     @Override
                     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                        if (actionId == EditorInfo.IME_ACTION_SEARCH ||
-                                actionId == EditorInfo.IME_ACTION_DONE ||
-                                event.getAction() == KeyEvent.ACTION_DOWN &&
-                                        event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-                            if (!event.isShiftPressed()) {
-                                // получаем строку без бробелов(в начале и в конце) из поля ввода(search_field)
-                                String album_name = search_field.getText().toString().trim();
-                                Log.d("album", album_name);
-                                // проверяем полученную строку на наличие символов, и если они есть ищем альбомы
-                                if(album_name.length() != 0){
-                                    requestToItunesAPI.universalRequest("album", album_name, new CallBackForGettingAlbumsAndCreateList(), null);
-                                }
-                                // возвращаем true если нет действия
-                                return true;
+//                        if (actionId == EditorInfo.IME_ACTION_SEARCH ||
+//                                actionId == EditorInfo.IME_ACTION_DONE ||
+//                                event.getAction() == KeyEvent.ACTION_DOWN &&
+//                                        event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+//                            if (!event.isShiftPressed()) {
+
+                        if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+
+                            // получаем строку без пробелов(в начале и в конце) из поля ввода(search_field)
+                            String album_name = search_field.getText().toString().trim();
+                            Log.d("album", album_name);
+                            // проверяем полученную строку на наличие символов, и если они есть ищем альбомы
+                            if(album_name.length() != 0){
+                                requestToItunesAPI.universalRequest("album", album_name, new CallBackForGettingAlbumsAndCreateList(), null);
                             }
+
+                            if(inputManager != null) {
+                                // закрытие клавиатуры, что бы не мешала просмотру результатов
+                                inputManager.hideSoftInputFromWindow(search_field.getWindowToken(), 0);
+                            }
+
+                            // возвращаем true если нет действия
+                            return true;
                         }
                         // возвращаем false если нет действия
                         return false;
                     }
                 });
 
-                // получаем ImageView send и устанавливаем для него слушатель
-                ((ImageView) newBar.findViewById(R.id.send)).setOnClickListener(new View.OnClickListener() {
+                // получаем ImageView clear и устанавливаем для него слушатель, в котором при нажатии отчищаем поле ввода
+                ((ImageView) newBar.findViewById(R.id.clear)).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // получаем строку без бробелов(в начале и в конце) из поля ввода(search_field)
-                        String album_name = search_field.getText().toString().trim();
-                        Log.d("album", album_name);
-                        // проверяем полученную строку на наличие символов, и если они есть ищем альбомы
-                        if(album_name.length() != 0){
-                            requestToItunesAPI.universalRequest("album", album_name, new CallBackForGettingAlbumsAndCreateList(), null);
-                        }
+                        // отчищаем поле ввода
+                        search_field.setText("");
                     }
                 });
 
@@ -256,12 +310,16 @@ public class MainActivity extends AppCompatActivity {
                     fragment_transaction = getSupportFragmentManager().beginTransaction();
                     if(result_list == null){
                         error_search_fragment = new ErrorSearchFragment();
+                        // для того чтобы при восстановлении явно проверить какой fragment нужно установить
+                        fragment_list_for_albums = null;
                         fragment_transaction.replace(R.id.fragmentList, error_search_fragment);
                     }else {
                         Bundle args = new Bundle();
                         args.putParcelableArrayList("result_list", (ArrayList<? extends Parcelable>) result_list);
                         fragment_list_for_albums = new FragmentListForAlbums();
                         fragment_list_for_albums.setArguments(args);
+                        // для того чтобы при восстановлении явно проверить какой fragment нужно установить
+                        error_search_fragment = null;
                         // если использовать вместо android.support.v4.app.Fragment android.app.Fragment, то это приводит к странному поведению программы, см. ниже
                         // заменяем текущий список новым, должен быть метод replays, но здесь он работает как add, а add как replays
                         // если список заменить на TextView(в Album_list.xml), то все работает как надо...

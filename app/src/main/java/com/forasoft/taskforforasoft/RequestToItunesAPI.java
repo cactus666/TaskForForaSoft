@@ -146,9 +146,10 @@ public class RequestToItunesAPI {
                         // проходимся по каждому треку и вызываем метод обработки трека, пропускае первый, т.к. это альбом
                         for(int i = 1; i < countTrack; i++){
                             trackJsonObject = resJsonArray.getJSONObject(i);
-                            new_track = fillMusicTrackMap(trackJsonObject);
+                            new_track = fillMusicTrackMap(trackJsonObject, i);
                             if(new_track != null) {
                                 // вызываем функцию заполнения объекта MusicTrack
+                                // i задает номер трека, т.к. то что получаю в реквесте бывает имеет одинаковые значения
                                 result_list.add(new_track);
                             }
                         }
@@ -225,7 +226,7 @@ public class RequestToItunesAPI {
     }
 
     // метод заполнения map для трека
-    Map<String, Object>  fillMusicTrackMap(JSONObject albumJsonObject){
+    Map<String, Object>  fillMusicTrackMap(JSONObject albumJsonObject, int position){
         Map<String, Object> track_map = new HashMap<>();
 
         try {
@@ -241,11 +242,13 @@ public class RequestToItunesAPI {
             track_map.put("track_time", "0");
         }
 
-        try {
-            track_map.put("track_number", albumJsonObject.getInt("trackNumber"));
-        } catch (JSONException e) {
-            track_map.put("track_number", "0");
-        }
+//        try {
+//            track_map.put("track_number", albumJsonObject.getInt("trackNumber"));
+//        } catch (JSONException e) {
+//            track_map.put("track_number", "0");
+//        }
+
+        track_map.put("track_number", position);
 
         return track_map;
     }
