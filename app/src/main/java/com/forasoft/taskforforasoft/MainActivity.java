@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
                 View newBar = inflater.inflate(R.layout.search_menu, null);
 
                 // выставляем слушатель на стрелку назад
-                newBar.findViewById(R.id.back_arrow).setOnClickListener(on_click_listener_for_newBar);
+                newBar.findViewById(R.id.back_arrow).setOnClickListener(on_click_listener_for_back);
 
                 // находим EditText из newBar'a
                 search_field = (EditText)newBar.findViewById(R.id.search_field);
@@ -178,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    View.OnClickListener on_click_listener_for_newBar = new View.OnClickListener() {
+    View.OnClickListener on_click_listener_for_back = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             if(inputManager != null) {
